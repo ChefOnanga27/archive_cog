@@ -1,0 +1,124 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Boîte de réception</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › Boîte de réception</div>
+  </div>
+</div>
+
+<% if (success && success.length > 0) { %>
+<div class="alert alert-success auto-close"><%= success[0] %><button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<% } %>
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close"><%= error[0] %></div>
+<% } %>
+
+<!-- Compteurs -->
+<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+  <div class="stat-card">
+    <div class="stat-icon vert">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-value"><%= compteurs.entrant %></div>
+      <div class="stat-label">Courriers entrants à traiter</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon bleu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-value"><%= compteurs.sortant %></div>
+      <div class="stat-label">Courriers sortants</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon jaune">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-value"><%= compteurs.interne %></div>
+      <div class="stat-label">Documents internes</div>
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3>Courriers entrants
+      <span style="font-size:13px;font-weight:400;color:#ADB5BD;margin-left:8px;"><%= pagination.count %> document(s)</span>
+    </h3>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Titre</th>
+          <th>Expéditeur</th>
+          <th>Catégorie</th>
+          <th>Date reçue</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (archives.length === 0) { %>
+        <tr>
+          <td colspan="7" style="text-align:center;padding:48px;color:#ADB5BD;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 10px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Boîte de réception vide
+          </td>
+        </tr>
+        <% } %>
+        <% archives.forEach(a => { %>
+        <tr>
+          <td><a href="/archives/<%= a.id %>" style="color:#0057A8;font-weight:600;font-size:12px;text-decoration:none;"><%= a.reference %></a></td>
+          <td style="font-weight:500;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><%= a.titre %></td>
+          <td style="font-size:12px;"><%= a.expediteur || '-' %></td>
+          <td>
+            <% if (a.categorie) { %>
+            <span class="badge" style="background:<%= a.categorie.couleur %>18;color:<%= a.categorie.couleur %>;font-size:11px;"><%= a.categorie.nom %></span>
+            <% } else { %><span style="color:#ADB5BD;">-</span><% } %>
+          </td>
+          <td style="font-size:12px;"><%= a.date_reception ? moment(a.date_reception).format('DD/MM/YYYY') : moment(a.created_at).format('DD/MM/YYYY') %></td>
+          <td><span class="badge badge-<%= a.statut %>" style="font-size:11px;"><%= a.statut === 'actif' ? 'À traiter' : a.statut %></span></td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <a href="/archives/<%= a.id %>" class="btn btn-icon btn-outline btn-sm" title="Consulter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </a>
+              <% if (a.statut === 'actif' && user && (user.role === 'super_admin' || user.role === 'archiviste')) { %>
+              <form method="POST" action="/boite-reception/<%= a.id %>/traiter">
+                <button type="submit" class="btn btn-success btn-sm" title="Marquer comme traité">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Traiter
+                </button>
+              </form>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (pagination.total > 1) { %>
+  <div class="pagination">
+    <% if (pagination.current > 1) { %>
+    <a href="?page=<%= pagination.current - 1 %>" class="page-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></a>
+    <% } %>
+    <% for(let p = Math.max(1, pagination.current - 2); p <= Math.min(pagination.total, pagination.current + 2); p++) { %>
+    <a href="?page=<%= p %>" class="page-btn <%= p === pagination.current ? 'active' : '' %>"><%= p %></a>
+    <% } %>
+    <% if (pagination.current < pagination.total) { %>
+    <a href="?page=<%= pagination.current + 1 %>" class="page-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

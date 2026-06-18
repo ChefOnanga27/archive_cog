@@ -1,0 +1,113 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Mon profil</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › Mon profil</div>
+  </div>
+</div>
+
+<% if (success && success.length > 0) { %>
+<div class="alert alert-success auto-close"><%= success[0] %><button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<% } %>
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close"><%= error[0] %></div>
+<% } %>
+
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;align-items:start;">
+
+  <!-- Carte profil -->
+  <div class="detail-section" style="text-align:center;">
+    <div style="width:84px;height:84px;border-radius:50%;background:<%=
+      profile.role === 'super_admin' ? '#0057A8' : profile.role === 'archiviste' ? '#009A44' : '#F4C300'
+    %>;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white;margin:0 auto 16px;">
+      <%= profile.prenom.charAt(0) %><%= profile.nom.charAt(0) %>
+    </div>
+    <div style="font-size:17px;font-weight:700;color:#212529;"><%= profile.prenom %> <%= profile.nom %></div>
+    <div style="font-size:13px;color:#ADB5BD;margin-top:2px;"><%= profile.email %></div>
+
+    <div style="margin-top:14px;">
+      <span class="badge <%= profile.role === 'super_admin' ? 'badge-bleu' : profile.role === 'archiviste' ? 'badge-vert' : 'badge-gris' %>" style="font-size:12px;padding:6px 14px;">
+        <%= profile.role === 'super_admin' ? '👑 Super Admin' : profile.role === 'archiviste' ? '📁 Archiviste' : '👁 Consultation' %>
+      </span>
+    </div>
+
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid #E9ECEF;display:flex;justify-content:space-around;text-align:center;">
+      <div>
+        <div style="font-size:22px;font-weight:700;color:#0057A8;"><%= stats.archivesCreees %></div>
+        <div style="font-size:11px;color:#ADB5BD;text-transform:uppercase;">Archives créées</div>
+      </div>
+      <div>
+        <div style="font-size:22px;font-weight:700;color:#009A44;"><%= stats.actionsTotal %></div>
+        <div style="font-size:11px;color:#ADB5BD;text-transform:uppercase;">Actions totales</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;">
+      <a href="/auth/change-password" class="btn btn-outline btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Changer le mot de passe
+      </a>
+    </div>
+  </div>
+
+  <!-- Colonne droite -->
+  <div>
+    <!-- Formulaire édition -->
+    <div class="detail-section">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Informations personnelles
+      </h3>
+      <form method="POST" action="/profil?_method=PUT">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" name="prenom" class="form-control" value="<%= profile.prenom %>" required>
+          </div>
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" name="nom" class="form-control" value="<%= profile.nom %>" required>
+          </div>
+          <div class="form-group form-full">
+            <label>Email</label>
+            <input type="email" class="form-control" value="<%= profile.email %>" disabled style="background:#f8f9fa;">
+            <span class="form-hint">L'email ne peut pas être modifié. Contactez un administrateur.</span>
+          </div>
+          <div class="form-group form-full">
+            <label>Service / Département</label>
+            <input type="text" name="service" class="form-control" value="<%= profile.service || '' %>">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+          Enregistrer
+        </button>
+      </form>
+    </div>
+
+    <!-- Dernières actions -->
+    <div class="detail-section">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Mes dernières actions
+      </h3>
+      <% if (dernieresActions.length === 0) { %>
+      <div style="text-align:center;padding:16px;color:#ADB5BD;font-size:13px;">Aucune action récente</div>
+      <% } %>
+      <div class="timeline">
+        <% dernieresActions.forEach(h => { %>
+        <div class="timeline-item">
+          <div class="timeline-dot <%= h.action %>"></div>
+          <div class="timeline-content">
+            <div class="timeline-action"><%= h.action.charAt(0).toUpperCase() + h.action.slice(1) %> <% if (h.entite) { %><span style="color:#ADB5BD;font-weight:400;">— <%= h.entite %></span><% } %></div>
+            <div class="timeline-time"><%= moment(h.created_at).format('DD/MM/YYYY à HH:mm') %></div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

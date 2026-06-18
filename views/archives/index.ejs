@@ -1,0 +1,242 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Archives numériques</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › Archives</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <% if (user && (user.role === 'super_admin' || user.role === 'archiviste')) { %>
+    <div class="dropdown">
+      <button class="btn btn-outline btn-sm" data-toggle="dropdown">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exporter
+      </button>
+      <div class="dropdown-menu">
+        <a href="/archives/export/pdf">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Exporter PDF
+        </a>
+        <a href="/archives/export/excel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Exporter Excel
+        </a>
+        <a href="/archives/export/csv">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Exporter CSV
+        </a>
+      </div>
+    </div>
+    <a href="/archives/creer" class="btn btn-primary btn-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvelle archive
+    </a>
+    <% } %>
+  </div>
+</div>
+
+<% if (success && success.length > 0) { %>
+<div class="alert alert-success auto-close">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  <%= success[0] %>
+  <button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+</div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+  <%= error[0] %>
+  <button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+</div>
+<% } %>
+
+<!-- FILTRES -->
+<div class="filters-card">
+  <form method="GET" action="/archives">
+    <div class="filters-grid">
+      <div class="form-group">
+        <label>Recherche</label>
+        <input type="text" name="search" class="form-control" placeholder="Référence, titre..." value="<%= filters.search || '' %>">
+      </div>
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select name="categorie" class="form-control">
+          <option value="">Toutes les catégories</option>
+          <% categories.forEach(c => { %>
+          <option value="<%= c.id %>" <%= filters.categorie === c.id ? 'selected' : '' %>><%= c.nom %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Service</label>
+        <select name="service" class="form-control">
+          <option value="">Tous les services</option>
+          <% services.forEach(s => { %>
+          <option value="<%= s.id %>" <%= filters.service === s.id ? 'selected' : '' %>><%= s.nom %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select name="type" class="form-control">
+          <option value="">Tous les types</option>
+          <option value="entrant" <%= filters.type === 'entrant' ? 'selected' : '' %>>Entrant</option>
+          <option value="sortant" <%= filters.type === 'sortant' ? 'selected' : '' %>>Sortant</option>
+          <option value="interne" <%= filters.type === 'interne' ? 'selected' : '' %>>Interne</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Confidentialité</label>
+        <select name="confidentialite" class="form-control">
+          <option value="">Toutes</option>
+          <option value="public" <%= filters.confidentialite === 'public' ? 'selected' : '' %>>Public</option>
+          <option value="normal" <%= filters.confidentialite === 'normal' ? 'selected' : '' %>>Normal</option>
+          <option value="confidentiel" <%= filters.confidentialite === 'confidentiel' ? 'selected' : '' %>>Confidentiel</option>
+          <option value="secret" <%= filters.confidentialite === 'secret' ? 'selected' : '' %>>Secret</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date début</label>
+        <input type="date" name="date_debut" class="form-control" value="<%= filters.date_debut || '' %>">
+      </div>
+      <div class="form-group">
+        <label>Date fin</label>
+        <input type="date" name="date_fin" class="form-control" value="<%= filters.date_fin || '' %>">
+      </div>
+      <div class="form-group" style="justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:8px;">
+        <button type="submit" class="btn btn-primary btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Filtrer
+        </button>
+        <a href="/archives" class="btn btn-outline btn-sm">Effacer</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- TABLEAU -->
+<div class="table-card">
+  <div class="table-header">
+    <h3>
+      Archives
+      <span style="font-size:13px;font-weight:400;color:#ADB5BD;margin-left:8px;"><%= pagination.count %> résultat(s)</span>
+    </h3>
+    <a href="/archives/recherche/avancee" class="btn btn-outline btn-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Recherche avancée
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Référence</th>
+          <th>Titre</th>
+          <th>Catégorie</th>
+          <th>Service</th>
+          <th>Type</th>
+          <th>Confidentialité</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (archives.length === 0) { %>
+        <tr>
+          <td colspan="10" style="text-align:center;padding:48px;color:#ADB5BD;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 12px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <div style="font-weight:600;color:#495057;margin-bottom:4px;">Aucune archive trouvée</div>
+            <div style="font-size:12px;">Modifiez vos filtres ou créez une nouvelle archive</div>
+          </td>
+        </tr>
+        <% } %>
+        <% archives.forEach((a, i) => { %>
+        <tr>
+          <td style="color:#ADB5BD;font-size:12px;"><%= (pagination.current - 1) * 15 + i + 1 %></td>
+          <td>
+            <a href="/archives/<%= a.id %>" style="color:#0057A8;font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap;">
+              <%= a.reference %>
+            </a>
+          </td>
+          <td style="max-width:220px;">
+            <a href="/archives/<%= a.id %>" style="color:#212529;text-decoration:none;font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="<%= a.titre %>">
+              <%= a.titre %>
+            </a>
+            <% if (a.createur) { %>
+            <div style="font-size:11px;color:#ADB5BD;">par <%= a.createur.prenom %> <%= a.createur.nom %></div>
+            <% } %>
+          </td>
+          <td>
+            <% if (a.categorie) { %>
+            <span class="badge" style="background:<%= a.categorie.couleur %>18;color:<%= a.categorie.couleur %>;font-size:11px;"><%= a.categorie.nom %></span>
+            <% } else { %><span style="color:#ADB5BD;font-size:12px;">-</span><% } %>
+          </td>
+          <td style="font-size:12px;"><%= a.service ? a.service.nom : '-' %></td>
+          <td>
+            <span class="badge <%= a.type_document === 'entrant' ? 'badge-vert' : a.type_document === 'sortant' ? 'badge-bleu' : 'badge-gris' %>" style="font-size:11px;">
+              <%= a.type_document === 'entrant' ? '↓' : a.type_document === 'sortant' ? '↑' : '↔' %> <%= a.type_document %>
+            </span>
+          </td>
+          <td>
+            <span class="badge confidentialite-badge <%= a.confidentialite %>" style="font-size:11px;"><%= a.confidentialite %></span>
+          </td>
+          <td style="font-size:12px;white-space:nowrap;">
+            <%= a.date_document ? moment(a.date_document).format('DD/MM/YY') : moment(a.created_at).format('DD/MM/YY') %>
+          </td>
+          <td>
+            <span class="badge badge-<%= a.statut %>" style="font-size:11px;"><%= a.statut %></span>
+          </td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <a href="/archives/<%= a.id %>" class="btn btn-icon btn-outline btn-sm" title="Consulter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </a>
+              <% if (user && (user.role === 'super_admin' || user.role === 'archiviste')) { %>
+              <a href="/archives/<%= a.id %>/modifier" class="btn btn-icon btn-sm" style="background:#FEF9E0;color:#B8920A;border:1.5px solid #F0D878;" title="Modifier">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </a>
+              <form method="POST" action="/archives/<%= a.id %>?_method=DELETE" style="display:inline;" data-confirm="Déplacer cette archive à la corbeille ?">
+                <button type="submit" class="btn btn-icon btn-sm" style="background:#FDECEE;color:#CE1126;border:1.5px solid #F5B7C0;" title="Supprimer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                </button>
+              </form>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  <% if (pagination.total > 1) { %>
+  <div class="pagination">
+    <% if (pagination.current > 1) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: pagination.current - 1}).toString() %>" class="page-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <% } else { %>
+    <span class="page-btn disabled"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></span>
+    <% } %>
+
+    <% for(let p = Math.max(1, pagination.current - 2); p <= Math.min(pagination.total, pagination.current + 2); p++) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: p}).toString() %>" class="page-btn <%= p === pagination.current ? 'active' : '' %>"><%= p %></a>
+    <% } %>
+
+    <% if (pagination.current < pagination.total) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: pagination.current + 1}).toString() %>" class="page-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <% } %>
+
+    <span class="pagination-info">Page <%= pagination.current %> / <%= pagination.total %> · <%= pagination.count %> archives</span>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

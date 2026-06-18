@@ -1,0 +1,142 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Historique des activités</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › Historique</div>
+  </div>
+</div>
+
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close"><%= error[0] %></div>
+<% } %>
+
+<!-- Filtres -->
+<div class="filters-card">
+  <form method="GET" action="/historique">
+    <div class="filters-grid">
+      <div class="form-group">
+        <label>Action</label>
+        <select name="action" class="form-control">
+          <option value="">Toutes les actions</option>
+          <% ['connexion','deconnexion','ajout','modification','suppression','restauration','telechargement','consultation','export'].forEach(a => { %>
+          <option value="<%= a %>" <%= filters.action === a ? 'selected' : '' %>><%= a.charAt(0).toUpperCase() + a.slice(1) %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Utilisateur</label>
+        <select name="user_id" class="form-control">
+          <option value="">Tous les utilisateurs</option>
+          <% users.forEach(u => { %>
+          <option value="<%= u.id %>" <%= filters.user_id === u.id ? 'selected' : '' %>><%= u.prenom %> <%= u.nom %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group" style="flex-direction:row;align-items:flex-end;gap:8px;">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
+        <a href="/historique" class="btn btn-outline btn-sm">Effacer</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Tableau -->
+<div class="table-card">
+  <div class="table-header">
+    <h3>Journal d'activité
+      <span style="font-size:13px;font-weight:400;color:#ADB5BD;margin-left:8px;"><%= pagination.count %> entrée(s)</span>
+    </h3>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Date/Heure</th>
+          <th>Utilisateur</th>
+          <th>Rôle</th>
+          <th>Action</th>
+          <th>Entité</th>
+          <th>Adresse IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (historique.length === 0) { %>
+        <tr>
+          <td colspan="6" style="text-align:center;padding:40px;color:#ADB5BD;">Aucune activité enregistrée</td>
+        </tr>
+        <% } %>
+        <% historique.forEach(h => { %>
+        <tr>
+          <td style="font-size:12px;white-space:nowrap;">
+            <div style="font-weight:600;"><%= moment(h.created_at).format('DD/MM/YYYY') %></div>
+            <div style="color:#ADB5BD;"><%= moment(h.created_at).format('HH:mm:ss') %></div>
+          </td>
+          <td>
+            <% if (h.utilisateur) { %>
+            <div style="font-weight:600;font-size:13px;"><%= h.utilisateur.prenom %> <%= h.utilisateur.nom %></div>
+            <% } else { %>
+            <span style="color:#ADB5BD;font-size:12px;">Système</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (h.utilisateur) { %>
+            <span class="badge <%= h.utilisateur.role === 'super_admin' ? 'badge-bleu' : h.utilisateur.role === 'archiviste' ? 'badge-vert' : 'badge-gris' %>" style="font-size:11px;">
+              <%= h.utilisateur.role === 'super_admin' ? 'Super Admin' : h.utilisateur.role === 'archiviste' ? 'Archiviste' : 'Consultation' %>
+            </span>
+            <% } else { %><span style="color:#ADB5BD;">-</span><% } %>
+          </td>
+          <td>
+            <span class="badge" style="font-size:11px;background:<%=
+              h.action === 'ajout' ? '#E6F5ED' :
+              h.action === 'modification' ? '#FEF9E0' :
+              h.action === 'suppression' ? '#FDECEE' :
+              h.action === 'connexion' ? '#E8F0FB' :
+              h.action === 'export' ? '#E8F0FB' : '#F8F9FA'
+            %>;color:<%=
+              h.action === 'ajout' ? '#009A44' :
+              h.action === 'modification' ? '#B8920A' :
+              h.action === 'suppression' ? '#CE1126' :
+              h.action === 'connexion' ? '#0057A8' :
+              h.action === 'export' ? '#0057A8' : '#495057'
+            %>;">
+              <%= h.action.charAt(0).toUpperCase() + h.action.slice(1) %>
+            </span>
+          </td>
+          <td style="font-size:12px;">
+            <% if (h.entite) { %>
+            <span style="color:#ADB5BD;"><%= h.entite %></span>
+            <% if (h.entite_id && h.entite === 'archives') { %>
+            <a href="/archives/<%= h.entite_id %>" style="color:#0057A8;text-decoration:none;font-size:11px;display:block;">Voir →</a>
+            <% } %>
+            <% } else { %><span style="color:#ADB5BD;">-</span><% } %>
+          </td>
+          <td style="font-size:12px;color:#ADB5BD;font-family:monospace;"><%= h.ip_address || '-' %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pagination.total > 1) { %>
+  <div class="pagination">
+    <% if (pagination.current > 1) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: pagination.current - 1}).toString() %>" class="page-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <% } %>
+    <% for(let p = Math.max(1, pagination.current - 2); p <= Math.min(pagination.total, pagination.current + 2); p++) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: p}).toString() %>" class="page-btn <%= p === pagination.current ? 'active' : '' %>"><%= p %></a>
+    <% } %>
+    <% if (pagination.current < pagination.total) { %>
+    <a href="?<%= new URLSearchParams({...filters, page: pagination.current + 1}).toString() %>" class="page-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <% } %>
+    <span class="pagination-info">Page <%= pagination.current %> / <%= pagination.total %> · <%= pagination.count %> entrées</span>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

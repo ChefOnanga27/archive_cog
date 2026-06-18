@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Gestion des utilisateurs</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › Utilisateurs</div>
+  </div>
+  <a href="/utilisateurs/creer" class="btn btn-primary btn-sm">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nouvel utilisateur
+  </a>
+</div>
+
+<% if (success && success.length > 0) { %>
+<div class="alert alert-success auto-close"><%= success[0] %><button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<% } %>
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close"><%= error[0] %></div>
+<% } %>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3>Utilisateurs (<%= users.length %>)</h3>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Utilisateur</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Service</th>
+          <th>Dernière connexion</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((u, i) => { %>
+        <tr>
+          <td style="color:#ADB5BD;font-size:12px;"><%= i + 1 %></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:<%=
+                u.role === 'super_admin' ? '#0057A8' :
+                u.role === 'archiviste' ? '#009A44' : '#F4C300'
+              %>;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;">
+                <%= u.prenom.charAt(0) %><%= u.nom.charAt(0) %>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13px;"><%= u.prenom %> <%= u.nom %></div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:12px;"><%= u.email %></td>
+          <td>
+            <span class="badge <%=
+              u.role === 'super_admin' ? 'badge-bleu' :
+              u.role === 'archiviste' ? 'badge-vert' : 'badge-gris'
+            %>">
+              <%= u.role === 'super_admin' ? '👑 Super Admin' : u.role === 'archiviste' ? '📁 Archiviste' : '👁 Consultation' %>
+            </span>
+          </td>
+          <td style="font-size:12px;"><%= u.service || '-' %></td>
+          <td style="font-size:12px;">
+            <%= u.derniere_connexion ? moment(u.derniere_connexion).format('DD/MM/YY HH:mm') : 'Jamais' %>
+          </td>
+          <td>
+            <span class="badge <%= u.actif ? 'badge-vert' : 'badge-rouge' %>">
+              <%= u.actif ? '✓ Actif' : '✗ Inactif' %>
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <a href="/utilisateurs/<%= u.id %>/modifier" class="btn btn-icon btn-sm" style="background:#FEF9E0;color:#B8920A;border:1.5px solid #F0D878;" title="Modifier">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </a>
+              <% if (u.id !== user.id) { %>
+              <form method="POST" action="/utilisateurs/<%= u.id %>/toggle-actif">
+                <button type="submit" class="btn btn-icon btn-sm <%= u.actif ? '' : 'btn-success' %>" 
+                  style="<%= u.actif ? 'background:#FDECEE;color:#CE1126;border:1.5px solid #F5B7C0;' : '' %>"
+                  title="<%= u.actif ? 'Désactiver' : 'Activer' %>">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <% if (u.actif) { %>
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    <% } else { %>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    <% } %>
+                  </svg>
+                </button>
+              </form>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

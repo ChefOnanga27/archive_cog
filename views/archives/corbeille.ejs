@@ -1,0 +1,77 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Corbeille</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › <a href="/archives">Archives</a> › Corbeille</div>
+  </div>
+</div>
+
+<% if (success && success.length > 0) { %>
+<div class="alert alert-success auto-close"><%= success[0] %><button class="alert-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<% } %>
+<% if (error && error.length > 0) { %>
+<div class="alert alert-error auto-close"><%= error[0] %></div>
+<% } %>
+
+<div class="alert alert-warning">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  Les archives dans la corbeille peuvent être restaurées ou supprimées définitivement.
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3>Archives à la corbeille (<%= archives.length %>)</h3>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Titre</th>
+          <th>Catégorie</th>
+          <th>Service</th>
+          <th>Date suppression</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (archives.length === 0) { %>
+        <tr>
+          <td colspan="6" style="text-align:center;padding:40px;color:#ADB5BD;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 10px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            La corbeille est vide
+          </td>
+        </tr>
+        <% } %>
+        <% archives.forEach(a => { %>
+        <tr>
+          <td><span style="font-weight:600;color:#0057A8;font-size:12px;"><%= a.reference %></span></td>
+          <td style="font-weight:500;"><%= a.titre %></td>
+          <td><%= a.categorie ? a.categorie.nom : '-' %></td>
+          <td><%= a.service ? a.service.nom : '-' %></td>
+          <td style="font-size:12px;"><%= a.deleted_at ? moment(a.deleted_at).format('DD/MM/YYYY HH:mm') : '-' %></td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <form method="POST" action="/archives/<%= a.id %>/restaurer">
+                <button type="submit" class="btn btn-success btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+                  Restaurer
+                </button>
+              </form>
+              <form method="POST" action="/archives/<%= a.id %>/supprimer-definitif?_method=DELETE" data-confirm="⚠️ Supprimer définitivement cette archive ? Cette action est IRRÉVERSIBLE.">
+                <button type="submit" class="btn btn-danger btn-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                  Supprimer définitivement
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

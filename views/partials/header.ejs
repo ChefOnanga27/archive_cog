@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="/css/main.css">
+  <script>
+    window.cogUserId = '<%= user ? user.id : "" %>';
+  </script>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="3"/><circle cx="19" cy="8" r="2"/><circle cx="5" cy="8" r="2"/><path d="M12 21v-5m0 0a5 5 0 0 1-5-5h10a5 5 0 0 1-5 5z"/></svg>
+      </div>
+      <div class="logo-text">
+        <div class="org-name">Comité Olympique</div>
+        <div class="app-name">Gabonais · Archives</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Principal</div>
+        <a href="/dashboard" class="nav-item <%= currentPath === '/dashboard' || currentPath === '/' ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Tableau de bord
+        </a>
+        <a href="/boite-reception" class="nav-item <%= currentPath.startsWith('/boite-reception') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+          Boîte de réception
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Documents</div>
+        <a href="/archives" class="nav-item <%= currentPath.startsWith('/archives') && !currentPath.includes('corbeille') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Archives numériques
+        </a>
+        <a href="/archives?type_document=entrant" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Courriers entrants
+        </a>
+        <a href="/archives?type_document=sortant" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+          Courriers sortants
+        </a>
+        <a href="/archives?type_document=interne" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          Documents internes
+        </a>
+        <a href="/archives/recherche/avancee" class="nav-item <%= currentPath.includes('recherche') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Recherche avancée
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Gestion</div>
+        <a href="/historique" class="nav-item <%= currentPath.startsWith('/historique') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Historique
+        </a>
+        <a href="/archives/corbeille/liste" class="nav-item <%= currentPath.includes('corbeille') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Corbeille
+        </a>
+        <% if (user && (user.role === 'super_admin' || user.role === 'archiviste')) { %>
+        <a href="/utilisateurs" class="nav-item <%= currentPath.startsWith('/utilisateurs') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Utilisateurs
+        </a>
+        <% } %>
+      </div>
+
+      <% if (user && user.role === 'super_admin') { %>
+      <div class="nav-section">
+        <div class="nav-section-title">Configuration</div>
+        <a href="/parametres/categories" class="nav-item <%= currentPath.startsWith('/parametres/categories') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Catégories
+        </a>
+        <a href="/parametres/services" class="nav-item <%= currentPath.startsWith('/parametres/services') ? 'active' : '' %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Services
+        </a>
+      </div>
+      <% } %>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="user-avatar-sm">
+          <%= user ? (user.prenom.charAt(0) + user.nom.charAt(0)) : 'U' %>
+        </div>
+        <div class="user-info flex-1">
+          <div class="user-name"><%= user ? `${user.prenom} ${user.nom}` : '' %></div>
+          <div class="user-role">
+            <%= user && user.role === 'super_admin' ? 'Super Admin' : user && user.role === 'archiviste' ? 'Archiviste' : 'Consultation' %>
+          </div>
+        </div>
+        <a href="/auth/logout" style="color:rgba(255,255,255,0.6);display:flex;" title="Déconnexion">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-btn" id="sidebar-toggle" style="display:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <div class="topbar-title">
+        Comité Olympique Gabonais
+        <span>Système d'Archivage Numérique</span>
+      </div>
+
+      <div class="search-global">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search-global" placeholder="Rechercher une archive..." autocomplete="off">
+      </div>
+
+      <div class="topbar-actions">
+        <a href="/archives/creer" class="btn btn-primary btn-sm" <% if (!user || user.role === 'consultation') { %>style="display:none"<% } %>>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvelle archive
+        </a>
+
+        <!-- Notifications -->
+        <button class="topbar-btn" id="notif-btn" title="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <% if (notifCount > 0) { %>
+          <span class="notif-badge"><%= notifCount %></span>
+          <% } %>
+        </button>
+
+        <!-- Profil dropdown -->
+        <div class="dropdown">
+          <button class="topbar-btn" data-toggle="dropdown" title="Profil">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+          <div class="dropdown-menu">
+            <a href="/profil">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Mon profil
+            </a>
+            <a href="/auth/change-password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Changer le mot de passe
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="/auth/logout">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Déconnexion
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Panel notifications -->
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-panel-header">
+        <h4>Notifications</h4>
+        <button onclick="markAllRead()" style="background:none;border:none;color:rgba(255,255,255,0.8);font-size:12px;cursor:pointer;font-family:Poppins">Tout marquer lu</button>
+      </div>
+      <div id="notif-list">
+        <div class="notif-empty">Chargement...</div>
+      </div>
+    </div>
+
+    <div class="page-body">

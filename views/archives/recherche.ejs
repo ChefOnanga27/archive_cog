@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1>Recherche avancée</h1>
+    <div class="breadcrumb"><a href="/dashboard">Accueil</a> › <a href="/archives">Archives</a> › Recherche avancée</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;">
+
+  <!-- Formulaire de recherche -->
+  <div class="form-card" style="position:sticky;top:84px;">
+    <h3 style="font-size:14px;font-weight:600;color:#0057A8;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #E8F0FB;display:flex;align-items:center;gap:8px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Filtres de recherche
+    </h3>
+
+    <form method="POST" action="/archives/recherche/avancee">
+      <div class="form-group mb-16">
+        <label>Recherche textuelle</label>
+        <input type="text" name="search" class="form-control" value="<%= filters.search || '' %>" placeholder="Titre, référence, description...">
+      </div>
+      <div class="form-group mb-16">
+        <label>Catégorie</label>
+        <select name="categorie_id" class="form-control">
+          <option value="">Toutes</option>
+          <% categories.forEach(c => { %>
+          <option value="<%= c.id %>" <%= filters.categorie_id === c.id ? 'selected' : '' %>><%= c.nom %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group mb-16">
+        <label>Service</label>
+        <select name="service_id" class="form-control">
+          <option value="">Tous</option>
+          <% services.forEach(s => { %>
+          <option value="<%= s.id %>" <%= filters.service_id === s.id ? 'selected' : '' %>><%= s.nom %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-group mb-16">
+        <label>Type de document</label>
+        <select name="type_document" class="form-control">
+          <option value="">Tous</option>
+          <option value="entrant" <%= filters.type_document === 'entrant' ? 'selected' : '' %>>Entrant</option>
+          <option value="sortant" <%= filters.type_document === 'sortant' ? 'selected' : '' %>>Sortant</option>
+          <option value="interne" <%= filters.type_document === 'interne' ? 'selected' : '' %>>Interne</option>
+        </select>
+      </div>
+      <div class="form-group mb-16">
+        <label>Confidentialité</label>
+        <select name="confidentialite" class="form-control">
+          <option value="">Toutes</option>
+          <option value="public">Public</option>
+          <option value="normal">Normal</option>
+          <option value="confidentiel">Confidentiel</option>
+          <option value="secret">Secret</option>
+        </select>
+      </div>
+      <div class="form-group mb-16">
+        <label>Expéditeur</label>
+        <input type="text" name="expediteur" class="form-control" value="<%= filters.expediteur || '' %>" placeholder="Nom ou organisme">
+      </div>
+      <div class="form-group mb-16">
+        <label>Date début</label>
+        <input type="date" name="date_debut" class="form-control" value="<%= filters.date_debut || '' %>">
+      </div>
+      <div class="form-group mb-16">
+        <label>Date fin</label>
+        <input type="date" name="date_fin" class="form-control" value="<%= filters.date_fin || '' %>">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="submit" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Rechercher
+        </button>
+        <a href="/archives/recherche/avancee" class="btn btn-outline">Réinitialiser</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Résultats -->
+  <div>
+    <% if (resultats === null) { %>
+    <div style="background:#fff;border-radius:8px;border:1.5px solid #E9ECEF;padding:60px;text-align:center;color:#ADB5BD;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="display:block;margin:0 auto 16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <div style="font-size:16px;font-weight:600;color:#495057;margin-bottom:8px;">Lancez une recherche</div>
+      <div style="font-size:13px;">Utilisez les filtres à gauche pour trouver vos archives</div>
+    </div>
+    <% } else { %>
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Résultats de recherche
+          <span style="font-size:13px;font-weight:400;color:#ADB5BD;margin-left:8px;"><%= resultats.length %> résultat(s)</span>
+        </h3>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Service</th>
+              <th>Type</th>
+              <th>Confidentialité</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (resultats.length === 0) { %>
+            <tr>
+              <td colspan="8" style="text-align:center;padding:40px;color:#ADB5BD;">Aucun résultat pour ces critères</td>
+            </tr>
+            <% } %>
+            <% resultats.forEach(a => { %>
+            <tr>
+              <td><a href="/archives/<%= a.id %>" style="color:#0057A8;font-weight:600;font-size:12px;text-decoration:none;"><%= a.reference %></a></td>
+              <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;"><%= a.titre %></td>
+              <td>
+                <% if (a.categorie) { %>
+                <span class="badge" style="background:<%= a.categorie.couleur %>18;color:<%= a.categorie.couleur %>;font-size:11px;"><%= a.categorie.nom %></span>
+                <% } else { %><span style="color:#ADB5BD;">-</span><% } %>
+              </td>
+              <td style="font-size:12px;"><%= a.service ? a.service.nom : '-' %></td>
+              <td>
+                <span class="badge <%= a.type_document === 'entrant' ? 'badge-vert' : a.type_document === 'sortant' ? 'badge-bleu' : 'badge-gris' %>" style="font-size:11px;">
+                  <%= a.type_document %>
+                </span>
+              </td>
+              <td><span class="badge confidentialite-badge <%= a.confidentialite %>" style="font-size:11px;"><%= a.confidentialite %></span></td>
+              <td style="font-size:12px;"><%= a.date_document ? moment(a.date_document).format('DD/MM/YY') : '-' %></td>
+              <td><a href="/archives/<%= a.id %>" class="btn btn-outline btn-sm btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></a></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
